@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Mapa de Doações — Colégio Cleoracy Aparecida Gil</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<header>
+  <img src="cleoracy.png" alt="Logo Cleoracy" style="height:36px;">
+  Colégio Estadual Cleoracy Aparecida Gil — Mapa de Doações
+</header>
+
+<!-- Botão sempre visível -->
+<button class="btn btn-ghost" id="toggleMenu">☰</button>
+
+<!-- Menu retrátil -->
+<div class="controls" role="region" aria-label="Controles" id="topControls">
+  <input id="city" placeholder="Digite sua cidade (opcional)"/>
+  <button class="btn btn-ghost" id="btnCity">Buscar Cidade</button>
+  <button class="btn btn-primary" id="btnNew">📍 Nova Doação</button>
+</div>
+
+<aside class="sidebar" id="sidebar" aria-live="polite">
+  <h3>Doações cadastradas</h3>
+  <div id="list">Carregando...</div>
+</aside>
+
+<!-- Modal de cadastro -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h2 id="modalTitle">Cadastrar Doação</h2>
+
+    <div class="field">
+      <label for="desc">Descrição *</label>
+      <textarea id="desc" rows="2" placeholder="Ex.: Casaco masculino, pouco uso"></textarea>
+    </div>
+
+    <div class="row">
+      <div class="field small">
+        <label for="size">Tamanho (opcional)</label>
+        <input id="size" placeholder="P / M / G / 42 / único">
+      </div>
+      <div class="field small">
+        <label for="time">Horário retirada *</label>
+        <input id="time" placeholder="Ex.: 09:00 - 12:00">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="place">Local retirada *</label>
+      <input id="place" placeholder="Rua, nº, bairro...">
+    </div>
+
+    <div class="field">
+      <label for="city">Cidade *</label>
+      <input id="cityDoacao" placeholder="Ex.: Douradina">
+    </div>
+
+    <div class="field">
+      <label for="phone">Telefone (WhatsApp) *</label>
+      <input id="phone" placeholder="(XX) XXXXX-XXXX">
+    </div>
+
+    <div class="field">
+      <label>Fotos (mín. 1 — máx. 3) *</label>
+      <input id="photos" type="file" accept="image/*" multiple />
+      <div class="photos-preview" id="preview"></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="saveBtn">Salvar</button>
+      <button class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
