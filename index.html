@@ -1,85 +1,109 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Mapa de Doações — Colégio Cleoracy Aparecida Gil</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="style.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DoaFácil</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <header>
-  <img src="cleoracy.png" alt="Logo Cleoracy" style="height:36px;">
-  Colégio Estadual Cleoracy Aparecida Gil — Mapa de Doações
+  <img src="cleoracy.png" alt="Logo Cleoracy">
+  DoaFácil
 </header>
 
-<!-- Botão sempre visível -->
-<button class="btn btn-ghost" id="toggleMenu">☰</button>
+<div class="typing-container" id="typing"></div>
 
-<!-- Menu retrátil -->
-<div class="controls" role="region" aria-label="Controles" id="topControls">
-  <input id="city" placeholder="Digite sua cidade (opcional)"/>
-  <button class="btn btn-ghost" id="btnCity">Buscar Cidade</button>
-  <button class="btn btn-primary" id="btnNew">📍 Nova Doação</button>
-</div>
+<main>
+  <div class="buttons">
+    <button class="btn btn-primary" id="btnDoar">Quero Doar</button>
+    <button class="btn btn-secondary" id="btnReceber">Receber Doação</button>
+  </div>
 
-<aside class="sidebar" id="sidebar" aria-live="polite">
-  <h3>Doações cadastradas</h3>
-  <div id="list">Carregando...</div>
-</aside>
+  <div class="filter-buttons">
+    <button class="btn btn-primary" id="showDoacoes">Mostrar Doações</button>
+    <button class="btn btn-secondary" id="showPedidos">Mostrar Pedidos</button>
+  </div>
 
-<!-- Modal de cadastro -->
-<div class="modal" id="modal" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <h2 id="modalTitle">Cadastrar Doação</h2>
+  <h2 class="doacoes-title">Doações Disponíveis</h2>
+  <div class="cards" id="doacoesContainer"></div>
 
+  <h2 class="pedidos-title">Pedidos de Doação</h2>
+  <div class="cards" id="pedidosContainer"></div>
+</main>
+
+<!-- Modal Doar -->
+<div class="modal" id="modalDoar">
+  <div class="modal-box">
+    <button class="close-btn" id="closeDoar">&times;</button>
+    <h2>Cadastrar Doação</h2>
     <div class="field">
-      <label for="desc">Descrição *</label>
-      <textarea id="desc" rows="2" placeholder="Ex.: Casaco masculino, pouco uso"></textarea>
+      <label>Descrição *</label>
+      <textarea id="doarDesc" rows="2" placeholder="Ex.: Casaco masculino"></textarea>
     </div>
-
-    <div class="row">
-      <div class="field small">
-        <label for="size">Tamanho (opcional)</label>
-        <input id="size" placeholder="P / M / G / 42 / único">
-      </div>
-      <div class="field small">
-        <label for="time">Horário retirada *</label>
-        <input id="time" placeholder="Ex.: 09:00 - 12:00">
-      </div>
-    </div>
-
     <div class="field">
-      <label for="place">Local retirada *</label>
-      <input id="place" placeholder="Rua, nº, bairro...">
+      <label>Tamanho (opcional)</label>
+      <input id="doarSize" placeholder="P / M / G / 42 / único">
     </div>
-
     <div class="field">
-      <label for="city">Cidade *</label>
-      <input id="cityDoacao" placeholder="Ex.: Douradina">
+      <label>Local de retirada *</label>
+      <input id="doarPlace" placeholder="Rua, nº, bairro...">
     </div>
-
     <div class="field">
-      <label for="phone">Telefone (WhatsApp) *</label>
-      <input id="phone" placeholder="(XX) XXXXX-XXXX">
+      <label>Horário da retirada *</label>
+      <input type="time" id="doarTime">
     </div>
-
     <div class="field">
-      <label>Fotos (mín. 1 — máx. 3) *</label>
-      <input id="photos" type="file" accept="image/*" multiple />
-      <div class="photos-preview" id="preview"></div>
+      <label>Telefone de contato *</label>
+      <input type="tel" id="doarPhone" placeholder="(XX) XXXXX-XXXX">
     </div>
-
-    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <button class="btn btn-primary" id="saveBtn">Salvar</button>
-      <button class="btn btn-ghost" id="cancelBtn">Cancelar</button>
+    <div class="field">
+      <label>Fotos (1-3) *</label>
+      <input type="file" id="doarPhotos" accept="image/*" multiple>
+      <div class="photos-preview" id="doarPreview"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-primary" id="saveDoar">Salvar</button>
     </div>
   </div>
 </div>
 
-<div id="map"></div>
+<!-- Modal Receber -->
+<div class="modal" id="modalReceber">
+  <div class="modal-box">
+    <button class="close-btn" id="closeReceber">&times;</button>
+    <h2>Cadastrar Pedido de Doação</h2>
+    <div class="field">
+      <label>Descrição *</label>
+      <textarea id="receberDesc" rows="2" placeholder="Ex.: Televisão 32''"></textarea>
+    </div>
+    <div class="field">
+      <label>Tipo *</label>
+      <select id="receberType">
+        <option value="">Selecione</option>
+        <option value="Roupas">Roupas</option>
+        <option value="Eletrônicos">Eletrônicos</option>
+        <option value="Móveis">Móveis</option>
+        <option value="Alimentos">Alimentos</option>
+        <option value="Outros">Outros</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Tamanho (opcional)</label>
+      <input id="receberSize" placeholder="P / M / G / 42 / único">
+    </div>
+    <div class="field">
+      <label>Telefone de contato *</label>
+      <input type="tel" id="receberPhone" placeholder="(XX) XXXXX-XXXX">
+    </div>
+    <div class="actions">
+      <button class="btn btn-secondary" id="saveReceber">Salvar</button>
+    </div>
+  </div>
+</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
