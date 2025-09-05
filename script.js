@@ -136,7 +136,7 @@ saveReceber.onclick=()=>{
   tx.oncomplete=()=>{ renderCards(); modalReceber.classList.remove('open'); }
 }
 
-// Render
+// Função renderCards
 function renderCards(){
   doacoesContainer.innerHTML='';
   pedidosContainer.innerHTML='';
@@ -147,4 +147,85 @@ function renderCards(){
       card.innerHTML=`
         ${d.photos.length>0?`<img src="${d.photos[0]}" alt="Foto">`:""}
         <div class="title">${d.desc}</div>
-        <div class="meta
+        <div class="meta">Local: ${d.place}</div>
+        <div class="meta">Horário: ${d.time}</div>
+        <div class="meta phone-link">📞 ${d.phone}</div>
+        <div class="card-actions">
+          <button class="edit-btn" onclick="editDoar('${d.id}')">Editar</button>
+          <button class="remove-btn" onclick="removeDoar('${d.id}')">Remover</button>
+        </div>`;
+      doacoesContainer.appendChild(card);
+    });
+  };
+
+  const tx2=db.transaction('pedidos','readonly').objectStore('pedidos');
+  tx2.getAll().onsuccess=e=>{
+    e.target.result.forEach(d=>{
+      const card=document.createElement('div'); card.className='card';
+      card.innerHTML=`
+        <div class="title">${d.desc}</div>
+        <div class="meta">Tipo: ${d.type}</div>
+        <div class="meta">Tamanho: ${d.size||"-"}</div>
+        <div class="meta phone-link">📞 ${d.phone}</div>
+        <div class="card-actions">
+          <button class="edit-btn" onclick="editReceber('${d.id}')">Editar</button>
+          <button class="remove-btn" onclick="removeReceber('${d.id}')">Remover</button>
+        </div>`;
+      pedidosContainer.appendChild(card);
+    });
+  };
+}
+
+// Editar e remover
+window.editDoar=id=>{
+  const tx=db.transaction('doacoes','readonly').objectStore('doacoes');
+  tx.get(id).onsuccess=e=>{
+    const d=e.target.result;
+    editDoarId=d.id;
+    doarDesc.value=d.desc;
+    doarSize.value=d.size;
+    doarPlace.value=d.place;
+    doarTime.value=d.time;
+    doarPhone.value=d.phone;
+    if(d.photos){
+      doarPreview.innerHTML='';
+      d.photos.forEach(src=>{
+        const img=document.createElement('img');
+        img.src=src;
+        doarPreview.appendChild(img);
+      });
+    }
+    modalDoar.classList.add('open');
+  };
+}
+
+window.removeDoar=id=>{
+  if(confirm("Deseja remover esta doação?")){
+    const tx=db.transaction('doacoes','readwrite').objectStore('doacoes').delete(id);
+    tx.oncomplete=()=>renderCards();
+  }
+}
+
+window.editReceber=id=>{
+  const tx=db.transaction('pedidos','readonly').objectStore('pedidos');
+  tx.get(id).onsuccess=e=>{
+    const d=e.target.result;
+    editReceberId=d.id;
+    receberDesc.value=d.desc;
+    receberType.value=d.type;
+    receberSize.value=d.size;
+    receberPhone.value=d.phone;
+    modalReceber.classList.add('open');
+  };
+}
+
+window.removeReceber=id=>{
+  if(confirm("Deseja remover este pedido?")){
+    const tx=db.transaction('pedidos','readwrite').objectStore('pedidos').delete(id);
+    tx.oncomplete=()=>renderCards();
+  }
+}
+
+// Filtros
+showDoacoesBtn.onclick=()=>{ doacoesContainer.classList.remove('hidden'); pedidosContainer.classList.add('hidden'); }
+showPedidosBtn.onclick=()=>{ pedidosContainer.classList.remove('hidden'); doacoesContainer.classList.add('hidden'); }
